@@ -40,4 +40,24 @@ class PhotoProviderService {
             }
         }
     }
+
+    fun savePhoto(
+        photoFile: MultipartFile,
+        directory: String,
+    ): String {
+        try {
+            val directoryPath = Paths.get(directory)
+            Files.createDirectories(directoryPath)
+            val fileName = photoFile.originalFilename ?: "default_name.jpg"
+            val filePath = directoryPath.resolve(fileName)
+            photoFile.inputStream.use { inputStream ->
+                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING)
+            }
+        }catch (e: java.nio.file.AccessDeniedException) {
+            throw RuntimeException("Access denied to directory: ${e.message}")
+        }catch (e: java.io.IOException) {
+            throw RuntimeException("Failed to save file due to IO error: ${e.message}")
+        }
+        return directory
+    }
 }

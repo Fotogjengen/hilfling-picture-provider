@@ -28,4 +28,20 @@ class PhotoController(private val photoProviderService: PhotoProviderService) {
                 HttpStatus.CREATED
         )
     }
+    @PostMapping("/upload")
+    fun uploadPhoto(@RequestParam("photoFile", required = true) photoFile: MultipartFile,
+                    @RequestParam("directory", required = true) directory: String):ResponseEntity<Any>{
+        // Validate input
+        if (photoFile.isEmpty || directory.isEmpty()) {
+            return ResponseEntity(
+                "Photo files and directory cannot be empty.",
+                HttpStatus.BAD_REQUEST
+            )
+        }
+        return ResponseEntity(
+            photoProviderService.savePhoto(photoFile, directory),
+            HttpStatus.CREATED
+        )
+    }
+
 }
